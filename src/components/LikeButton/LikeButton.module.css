@@ -1,0 +1,29 @@
+.button {
+  height: 44px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 14px;
+  border: 1px solid var(--like);
+  background: var(--paper);
+  color: var(--like);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--like);
+  color: var(--paper);
+}
+
+.count {
+  display: inline-block;
+  width: 1.4em;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  flex: 0 0 auto;
+}

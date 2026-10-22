@@ -30,25 +30,10 @@ button, input { font: inherit; }
   padding: 48px 20px 80px;
 }
 
-.header { margin-bottom: 36px; }
-
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.word {
-  font-family: var(--serif);
-  font-size: 40px;
-  line-height: 1;
-  font-weight: 600;
-}
-
-.tagline {
-  margin: 8px 0 0;
+.note {
+  margin: -12px 0 24px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .list {

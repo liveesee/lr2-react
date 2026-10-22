@@ -1,6 +1,6 @@
-import ArticleCard from "./components/ArticleCard/ArticleCard.jsx"
+import ArticleList from "./components/ArticleList/ArticleList.jsx"
+import TagFilter from "./components/TagFilter/TagFilter.jsx"
 import { Logo } from "./components/icons.jsx"
-import { articles } from "./data/articles.js"
 
 export default function App() {
   return (
@@ -12,10 +12,9 @@ export default function App() {
         </div>
         <p className="tagline">Редакционный блог</p>
       </header>
-      <main className="list">
-        {articles.map((article) => (
-          <ArticleCard key={article.id} {...article} />
-        ))}
+      <TagFilter />
+      <main>
+        <ArticleList />
       </main>
     </div>
   )

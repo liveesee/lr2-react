@@ -6,6 +6,7 @@ export const articles = [
     previewText: "О ритуалах, зерне бумаги и о том, почему некоторые мысли приходят только до первого кофе.",
     imageUrl: "/covers/article.jpeg",
     minutes: 8,
+    tag: "Эссе",
   },
   {
     id: 2,
@@ -14,6 +15,7 @@ export const articles = [
     previewText: "Тишина между абзацами тоже часть текста. Короткие записи, которые не нужно дочитывать вечером.",
     imageUrl: "/covers/article.jpeg",
     minutes: 5,
+    tag: "Заметки",
   },
   {
     id: 3,
@@ -22,13 +24,6 @@ export const articles = [
     previewText: "Как цвет страницы меняет скорость чтения и почему тёплая бумага держит взгляд дольше.",
     imageUrl: "/covers/article.jpeg",
     minutes: 6,
-  },
-  {
-    id: 4,
-    title: "Комната для медленного чтения",
-    author: "Илья Бор",
-    previewText: "Небольшой зал, тёплая бумага и никаких уведомлений. Место, где текст снова становится занятием.",
-    imageUrl: "/covers/article.jpeg",
-    minutes: 4,
+    tag: "Эссе",
   },
 ]

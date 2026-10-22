@@ -5,7 +5,7 @@ import CommentInput from "../CommentInput/CommentInput.jsx"
 import { Avatar, CommentIcon, ShareIcon } from "../icons.jsx"
 import styles from "./ArticleCard.module.css"
 
-export default function ArticleCard({ title, author, previewText, imageUrl, minutes }) {
+export default function ArticleCard({ title, author, previewText, imageUrl, minutes, tag }) {
   const [commentsOpen, setCommentsOpen] = useState(false)
 
   return (
@@ -19,6 +19,7 @@ export default function ArticleCard({ title, author, previewText, imageUrl, minu
             <p className={styles.minutes}>{minutes} мин</p>
           </div>
         </div>
+        <p className={styles.rubric}>{tag}</p>
         <h2 className={styles.title}>{title}</h2>
         <p className={styles.excerpt}>{previewText}</p>
         <div className={styles.actions}>
@@ -52,4 +53,5 @@ ArticleCard.propTypes = {
   previewText: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
   minutes: PropTypes.number.isRequired,
+  tag: PropTypes.string.isRequired,
 }

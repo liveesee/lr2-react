@@ -1,22 +1,50 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import PropTypes from "prop-types"
+import { fetchComments, postComment } from "@/lib/api"
+import { formatTimeAgo } from "@/lib/formatTimeAgo"
 import { Arrow, Avatar } from "../icons.jsx"
 import styles from "./CommentInput.module.css"
 
-export default function CommentInput() {
+export default function CommentInput({ article }) {
   const [text, setText] = useState("")
   const [focused, setFocused] = useState(false)
   const [error, setError] = useState(false)
   const [comments, setComments] = useState([])
+  const [requestError, setRequestError] = useState("")
+  const [sending, setSending] = useState(false)
 
-  function publish() {
+  useEffect(() => {
+    let active = true
+    fetchComments(article)
+      .then((list) => {
+        if (active) setComments(list)
+      })
+      .catch(() => {
+        if (active) setRequestError("Не удалось загрузить комментарии")
+      })
+    return () => {
+      active = false
+    }
+  }, [article])
+
+  async function publish() {
     const value = text.trim()
     if (!value) {
       setError(true)
       return
     }
-    setComments((list) => [...list, { id: Date.now(), author: "Вы", text: value }])
-    setText("")
-    setError(false)
+    setSending(true)
+    setRequestError("")
+    try {
+      const comment = await postComment(article, value)
+      setComments((list) => [...list, comment])
+      setText("")
+      setError(false)
+    } catch {
+      setRequestError("Не удалось отправить комментарий")
+    } finally {
+      setSending(false)
+    }
   }
 
   function onSubmit(event) {
@@ -53,17 +81,25 @@ export default function CommentInput() {
         />
       </div>
       {error ? <p className={styles.errorText}>Ошибка · добавьте пару слов</p> : null}
-      <button type="submit" className={styles.post}>
-        <span>Опубликовать</span>
+      <button type="submit" className={styles.post} disabled={sending}>
+        <span>Отправить</span>
         <Arrow />
       </button>
+      {requestError ? (
+        <p className={styles.errorText} role="alert">
+          {requestError}
+        </p>
+      ) : null}
       {comments.length === 0 ? (
         <p className={styles.empty}>Пока нет комментариев</p>
       ) : (
-        <ul className={styles.list}>
+        <ul className={styles.list} aria-label="Комментарии">
           {comments.map((comment) => (
-            <li key={comment.id} className={styles.item}>
-              <p className={styles.author}>{comment.author}</p>
+            <li key={comment._id} className={styles.item}>
+              <p className={styles.author}>
+                {comment.author}
+                <span className={styles.date}> · {formatTimeAgo(comment.createdAt)}</span>
+              </p>
               <p className={styles.text}>{comment.text}</p>
             </li>
           ))}
@@ -71,4 +107,8 @@ export default function CommentInput() {
       )}
     </form>
   )
+}
+
+CommentInput.propTypes = {
+  article: PropTypes.string.isRequired,
 }

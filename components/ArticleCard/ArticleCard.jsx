@@ -1,16 +1,18 @@
 import { useState } from "react"
+import Image from "next/image"
+import Link from "next/link"
 import PropTypes from "prop-types"
 import LikeButton from "../LikeButton/LikeButton.jsx"
 import CommentInput from "../CommentInput/CommentInput.jsx"
 import { Avatar, CommentIcon, ShareIcon } from "../icons.jsx"
 import styles from "./ArticleCard.module.css"
 
-export default function ArticleCard({ title, author, previewText, imageUrl, minutes }) {
+export default function ArticleCard({ slug, title, author, previewText, imageUrl, minutes }) {
   const [commentsOpen, setCommentsOpen] = useState(false)
 
   return (
     <article className={styles.card}>
-      <img className={styles.cover} src={imageUrl} alt="" />
+      <Image className={styles.cover} src={imageUrl} alt="" width={800} height={400} />
       <div className={styles.body}>
         <div className={styles.meta}>
           <Avatar />
@@ -19,7 +21,11 @@ export default function ArticleCard({ title, author, previewText, imageUrl, minu
             <p className={styles.minutes}>{minutes} мин</p>
           </div>
         </div>
-        <h2 className={styles.title}>{title}</h2>
+        <h2 className={styles.title}>
+          <Link href={`/posts/${slug}`} className={styles.link}>
+            {title}
+          </Link>
+        </h2>
         <p className={styles.excerpt}>{previewText}</p>
         <div className={styles.actions}>
           <LikeButton />
@@ -38,15 +44,18 @@ export default function ArticleCard({ title, author, previewText, imageUrl, minu
             </button>
           </div>
         </div>
-        <div className={styles.thread} hidden={!commentsOpen}>
-          <CommentInput />
-        </div>
+        {commentsOpen ? (
+          <div className={styles.thread}>
+            <CommentInput article={slug} />
+          </div>
+        ) : null}
       </div>
     </article>
   )
 }
 
 ArticleCard.propTypes = {
+  slug: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   author: PropTypes.string.isRequired,
   previewText: PropTypes.string.isRequired,

@@ -66,6 +66,11 @@
 
 .post:hover { background: var(--olive-soft); }
 
+.post:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .list {
   list-style: none;
   margin: 16px 0 0;
@@ -85,6 +90,11 @@
   margin: 0;
   font-size: 13px;
   font-weight: 500;
+}
+
+.date {
+  color: var(--muted);
+  font-weight: 400;
 }
 
 .text {

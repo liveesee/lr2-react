@@ -23,12 +23,4 @@ export const articles = [
     imageUrl: "/covers/article.jpeg",
     minutes: 6,
   },
-  {
-    id: 4,
-    title: "Комната для медленного чтения",
-    author: "Илья Бор",
-    previewText: "Небольшой зал, тёплая бумага и никаких уведомлений. Место, где текст снова становится занятием.",
-    imageUrl: "/covers/article.jpeg",
-    minutes: 4,
-  },
 ]

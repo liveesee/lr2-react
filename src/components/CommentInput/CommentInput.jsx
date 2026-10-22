@@ -1,10 +1,16 @@
 import { useState } from "react"
+import Box from "@mui/material/Box"
+import Button from "@mui/material/Button"
+import InputAdornment from "@mui/material/InputAdornment"
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemText from "@mui/material/ListItemText"
+import TextField from "@mui/material/TextField"
+import Typography from "@mui/material/Typography"
 import { Arrow, Avatar } from "../icons.jsx"
-import styles from "./CommentInput.module.css"
 
 export default function CommentInput() {
   const [text, setText] = useState("")
-  const [focused, setFocused] = useState(false)
   const [error, setError] = useState(false)
   const [comments, setComments] = useState([])
 
@@ -31,44 +37,47 @@ export default function CommentInput() {
     }
   }
 
-  const fieldClass = [styles.field, focused ? styles.focused : "", error ? styles.error : ""]
-    .filter(Boolean)
-    .join(" ")
-
   return (
-    <form className={styles.form} onSubmit={onSubmit}>
-      <div className={fieldClass}>
-        <Avatar />
-        <input
-          value={text}
-          placeholder={error ? "Комментарий не может быть пустым" : "Напишите вдумчивый ответ..."}
-          onChange={(event) => {
-            setText(event.target.value)
-            if (error && event.target.value.trim()) setError(false)
-          }}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          onKeyDown={onKeyDown}
-          aria-label="Текст комментария"
-        />
-      </div>
-      {error ? <p className={styles.errorText}>Ошибка · добавьте пару слов</p> : null}
-      <button type="submit" className={styles.post}>
-        <span>Опубликовать</span>
-        <Arrow />
-      </button>
+    <Box component="form" onSubmit={onSubmit} noValidate>
+      <TextField
+        fullWidth
+        size="small"
+        value={text}
+        error={error}
+        helperText={error ? "Ошибка · добавьте пару слов" : null}
+        placeholder={error ? "Комментарий не может быть пустым" : "Напишите вдумчивый ответ..."}
+        onChange={(event) => {
+          setText(event.target.value)
+          if (error && event.target.value.trim()) setError(false)
+        }}
+        onKeyDown={onKeyDown}
+        slotProps={{
+          htmlInput: { "aria-label": "Текст комментария" },
+          input: {
+            startAdornment: (
+              <InputAdornment position="start">
+                <Avatar />
+              </InputAdornment>
+            ),
+          },
+        }}
+      />
+      <Button type="submit" variant="contained" endIcon={<Arrow />} sx={{ mt: 1.5 }}>
+        Опубликовать
+      </Button>
       {comments.length === 0 ? (
-        <p className={styles.empty}>Пока нет комментариев</p>
+        <Typography variant="caption" color="text.secondary" component="p" sx={{ mt: 1 }}>
+          Пока нет комментариев
+        </Typography>
       ) : (
-        <ul className={styles.list}>
+        <List sx={{ mt: 1 }}>
           {comments.map((comment) => (
-            <li key={comment.id} className={styles.item}>
-              <p className={styles.author}>{comment.author}</p>
-              <p className={styles.text}>{comment.text}</p>
-            </li>
+            <ListItem key={comment.id} disableGutters divider>
+              <ListItemText primary={comment.author} secondary={comment.text} />
+            </ListItem>
           ))}
-        </ul>
+        </List>
       )}
-    </form>
+    </Box>
   )
 }

@@ -1,21 +1,22 @@
 import { useState } from "react"
 import PropTypes from "prop-types"
+import Button from "@mui/material/Button"
 import { Heart } from "../icons.jsx"
-import styles from "./LikeButton.module.css"
 
 export default function LikeButton({ initialCount = 0 }) {
   const [count, setCount] = useState(initialCount)
 
   return (
-    <button
-      type="button"
-      className={styles.button}
+    <Button
+      variant="outlined"
+      color="secondary"
+      startIcon={<Heart />}
       aria-label="Нравится"
       onClick={() => setCount((value) => value + 1)}
+      sx={{ fontVariantNumeric: "tabular-nums" }}
     >
-      <Heart />
-      <span className={styles.count}>{count}</span>
-    </button>
+      {count}
+    </Button>
   )
 }
 

@@ -1,22 +1,32 @@
+import Container from "@mui/material/Container"
+import Grid from "@mui/material/Grid"
+import Stack from "@mui/material/Stack"
+import Typography from "@mui/material/Typography"
 import ArticleCard from "./components/ArticleCard/ArticleCard.jsx"
 import { Logo } from "./components/icons.jsx"
 import { articles } from "./data/articles.js"
 
 export default function App() {
   return (
-    <div className="page">
-      <header className="header">
-        <div className="brand">
+    <Container maxWidth="xl" sx={{ pt: 6, pb: 10 }}>
+      <Stack component="header" spacing={1} sx={{ mb: 4 }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
           <Logo />
-          <span className="word">FOLIA</span>
-        </div>
-        <p className="tagline">Редакционный блог</p>
-      </header>
-      <main className="list">
+          <Typography variant="h1" sx={{ fontSize: 40, lineHeight: 1 }}>
+            FOLIA
+          </Typography>
+        </Stack>
+        <Typography variant="body2" color="text.secondary">
+          Редакционный блог
+        </Typography>
+      </Stack>
+      <Grid component="main" container spacing={3} sx={{ alignItems: "flex-start" }}>
         {articles.map((article) => (
-          <ArticleCard key={article.id} {...article} />
+          <Grid key={article.id} size={{ xs: 12, sm: 6, lg: 4 }}>
+            <ArticleCard {...article} />
+          </Grid>
         ))}
-      </main>
-    </div>
+      </Grid>
+    </Container>
   )
 }

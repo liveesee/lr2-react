@@ -1,5 +1,40 @@
 .header { margin-bottom: 36px; }
 
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.nav {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.navLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 14px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.navLink:hover { background: var(--bone); }
+
+.navLink[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper);
+}
+
 .brand {
   display: inline-flex;
   align-items: center;

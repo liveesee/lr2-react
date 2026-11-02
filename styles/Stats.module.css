@@ -1,0 +1,78 @@
+.main { max-width: 980px; }
+
+.title {
+  margin: 0 0 8px;
+  font-family: var(--serif);
+  font-size: 48px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+.lead {
+  margin: 0 0 24px;
+  color: var(--olive);
+  font-size: 16px;
+  line-height: 26px;
+}
+
+.figure {
+  margin: 0;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--paper);
+  box-shadow: 0 10px 28px -4px rgba(17, 18, 13, 0.12);
+}
+
+.caption {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.details {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.details summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.details summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.table {
+  width: 100%;
+  margin-top: 12px;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.table th { font-weight: 500; }
+
+.table td:nth-child(n + 3),
+.table th:nth-child(n + 3) { text-align: right; }
+
+.state {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.error {
+  color: var(--error);
+  font-size: 14px;
+}
+
+@media (max-width: 720px) {
+  .title { font-size: 36px; }
+  .figure { padding: 8px; }
+}

@@ -1,8 +1,38 @@
-# ЛР10. FOLIA — веб-доступность (WCAG)
+# ЛР11. FOLIA — базовые меры безопасности
 
-Вариант 4, блоговая платформа. Основа — приложение из лабораторной работы №9 (Next.js, Jest, Playwright). Аудит проводился для карточек статей, формы комментирования и кнопки «Нравится».
+Вариант 4, блоговая платформа. Основа — приложение из ЛР10. Бэкенд — REST API из репозитория `lr8`, ветка `lab11`. Вектор атаки — хранимая XSS через поле «Комментарий к статье».
 
-## Аудит доступности
+## Уязвимость
+
+Комментарии поддерживают простое форматирование (`<b>`, `<i>`, `<a href>`), поэтому текст выводится как HTML через `dangerouslySetInnerHTML`. До защиты API сохранял комментарий без изменений, а клиент вставлял его в страницу как есть. Нагрузка `<img src=x onerror="alert('XSS PoC')">` выполнялась у каждого, кто открывал статью. `<script>` при вставке через `innerHTML` браузер не запускает, поэтому для атаки нужен именно обработчик события.
+
+## Защита
+
+| Уровень | Где | Что сделано |
+| --- | --- | --- |
+| Санитизация на сервере | `lr8`: `utils/sanitize.js`, `middleware/validators.js` | DOMPurify + express-validator: до сохранения в БД и при выдаче остаются только `b`, `strong`, `i`, `em`, `br`, `a[href]` (`http(s):`, `mailto:`); чисто вредоносный комментарий отклоняется с `400` |
+| Санитизация при выводе | `lib/sanitize.js` | DOMPurify с тем же списком тегов перед `dangerouslySetInnerHTML` — на случай, если в ответе API окажется непроверенный HTML |
+| Заголовки Helmet | `server.js` | Next.js запускается через Express, Helmet выставляет заголовки на каждый ответ, включая HTML-страницы |
+| CSP | `server.js` | `script-src 'self'`, `script-src-attr 'none'`, `object-src 'none'`, `frame-ancestors 'none'`, `base-uri 'self'`, `form-action 'self'`; стили и шрифты — с `self` и Google Fonts |
+
+CSP передаётся заголовком вместе с HTML-документом, поэтому Helmet подключён именно к серверу, который отдаёт страницы, а не только к API.
+
+Сборка переведена на webpack (`next build --webpack`): Turbopack встраивает в страницу inline-скрипт загрузки чанков, который строгая политика `script-src 'self'` блокирует. При webpack-сборке на страницах только внешние скрипты и `__NEXT_DATA__` типа `application/json`, который CSP не затрагивает.
+
+В режиме разработки к `script-src` добавляется `'unsafe-eval'` — без него не работает горячая перезагрузка webpack.
+
+Проверка заголовков:
+
+```bash
+curl -I http://localhost:3000/posts/olive-ink
+```
+
+Тесты безопасности — `e2e/security.spec.js`, `__tests__/sanitize.test.js` и `__tests__/CommentInput.test.jsx`. Они проверяют:
+- наличие заголовков Helmet и CSP у страницы;
+- что вредоносный HTML из API не выполняется, а форматирование сохраняется;
+- что CSP блокирует встроенный обработчик, даже если очистку обойти.
+
+## ЛР10. Аудит доступности
 
 Автоматический аудит — axe-core (`@axe-core/playwright`) и Lighthouse (категория Accessibility). Скрипт `scripts/a11y-audit.mjs` проверяет четыре состояния: главная, главная с открытыми комментариями, страница статьи и страница статьи с ошибкой пустого комментария. Правила — WCAG 2.1 A/AA и best practices.
 
@@ -34,10 +64,11 @@ npx lighthouse http://localhost:3000 --only-categories=accessibility --view
 
 ```bash
 npm install
-npm run dev
+npm run dev                       # разработка
+npm run build && npm run start    # production
 ```
 
-Приложение открывается на http://localhost:3000. Запросы `/api/*` Next.js проксирует на API (`rewrites` в `next.config.mjs`), по умолчанию на http://localhost:4000. Другой адрес задаётся переменной `API_URL` при сборке или запуске.
+Оба режима запускают `server.js` — Express с Helmet, который передаёт запросы в Next.js. Порт задаётся переменной `PORT`. Приложение открывается на http://localhost:3000. Запросы `/api/*` Next.js проксирует на API (`rewrites` в `next.config.mjs`), по умолчанию на http://localhost:4000. Другой адрес задаётся переменной `API_URL` при сборке или запуске.
 
 ## Unit-тесты (Jest)
 
@@ -49,7 +80,12 @@ Jest настроен через `next/jest` (`jest.config.js`), компоне�
 
 - `formatTimeAgo.test.js` — функция `lib/formatTimeAgo.js` форматирует дату публикации комментария («только что», «5 минут назад», «2 часа назад», «3 дня назад»), некорректная дата даёт пустую строку.
 - `LikeButton.test.jsx` — при клике счётчик лайков увеличивается на 1.
-- `CommentInput.test.jsx` — модуль `lib/api.js` замокан через `jest.mock()`. Проверяются загрузка комментариев, отправка нового комментария и запрет пустой отправки.
+- `CommentInput.test.jsx` — модуль `lib/api.js` замокан через `jest.mock()`. Проверяются:
+  - загрузка комментариев и отправка нового;
+  - запрет пустой отправки;
+  - вывод форматирования без выполнения вредоносного HTML;
+  - показ причины, по которой сервер отклонил комментарий.
+- `sanitize.test.js` — `lib/sanitize.js` удаляет `<script>`, обработчики `on*` и `javascript:`-ссылки, оставляя разрешённое форматирование.
 
 ## E2E-тест (Playwright)
 
@@ -91,8 +127,10 @@ Playwright сам собирает и запускает приложение н
 
 - `pages/` — маршруты, `_app.js` и `_document.js`.
 - `components/` — `ArticleCard`, `LikeButton`, `CommentInput`, `SiteHeader`.
+- `server.js` — Express-сервер с Helmet и CSP поверх Next.js.
 - `lib/api.js` — запросы к API комментариев.
+- `lib/sanitize.js` — очистка HTML комментариев через DOMPurify.
 - `lib/formatTimeAgo.js` — форматирование даты публикации.
 - `data/articles.js` — mock-данные статей.
-- `__tests__/` — unit-тесты, `e2e/` — E2E-тесты, включая проверки доступности.
+- `__tests__/` — unit-тесты; `e2e/` — E2E-тесты, включая проверки доступности и безопасности.
 - `scripts/a11y-audit.mjs` — автоматический аудит axe-core.

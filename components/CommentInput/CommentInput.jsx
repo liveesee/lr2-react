@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from "react"
 import PropTypes from "prop-types"
 import { fetchComments, postComment } from "@/lib/api"
 import { formatTimeAgo } from "@/lib/formatTimeAgo"
+import { sanitizeComment } from "@/lib/sanitize"
 import { Arrow, Avatar } from "../icons.jsx"
 import styles from "./CommentInput.module.css"
 
@@ -16,6 +17,7 @@ export default function CommentInput({ article }) {
   const id = useId()
   const inputId = `${id}-input`
   const errorId = `${id}-error`
+  const hintId = `${id}-hint`
 
   useEffect(() => {
     let active = true
@@ -47,8 +49,12 @@ export default function CommentInput({ article }) {
       setText("")
       setError(false)
       setStatus("Комментарий опубликован")
-    } catch {
-      setRequestError("Не удалось отправить комментарий")
+    } catch (requestFailure) {
+      setRequestError(
+        requestFailure.reason
+          ? `Комментарий отклонён: ${requestFailure.reason}`
+          : "Не удалось отправить комментарий",
+      )
     } finally {
       setSending(false)
     }
@@ -86,10 +92,13 @@ export default function CommentInput({ article }) {
           }}
           onKeyDown={onKeyDown}
           aria-invalid={error}
-          aria-describedby={error ? errorId : undefined}
+          aria-describedby={error ? `${errorId} ${hintId}` : hintId}
           aria-keyshortcuts="Control+Enter Meta+Enter"
         />
       </div>
+      <p id={hintId} className={styles.hint}>
+        Форматирование: &lt;b&gt;, &lt;i&gt;, &lt;a href&gt;
+      </p>
       {error ? (
         <p id={errorId} className={styles.errorText} role="alert">
           Ошибка · добавьте пару слов
@@ -117,7 +126,7 @@ export default function CommentInput({ article }) {
                 {comment.author}
                 <span className={styles.date}> · {formatTimeAgo(comment.createdAt)}</span>
               </p>
-              <p className={styles.text}>{comment.text}</p>
+              <p className={styles.text} dangerouslySetInnerHTML={{ __html: sanitizeComment(comment.text) }} />
             </li>
           ))}
         </ul>

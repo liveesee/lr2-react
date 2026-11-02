@@ -11,7 +11,7 @@ module.exports = defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: `npm run build && npm run start -- -p ${PORT}`,
+    command: `npm run build && PORT=${PORT} npm run start`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,

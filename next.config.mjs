@@ -3,6 +3,7 @@ const apiUrl = process.env.API_URL ?? "http://localhost:4000";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  poweredByHeader: false,
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${apiUrl}/api/:path*` }];
   },

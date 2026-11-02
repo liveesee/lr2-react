@@ -24,6 +24,27 @@ describe("CommentInput", () => {
     expect(fetchComments).toHaveBeenCalledWith("olive-ink");
   });
 
+  it("выводит форматирование, но не выполняет HTML-атаку из ответа API", async () => {
+    window.alert = jest.fn();
+    fetchComments.mockResolvedValue([
+      {
+        _id: "xss",
+        author: "Вы",
+        text: `Отличная статья <b>спасибо</b>! <img src=x onerror="alert('XSS PoC')"><script>alert(1)</script>`,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
+
+    render(<CommentInput article="olive-ink" />);
+
+    const bold = await screen.findByText("спасибо");
+    const text = bold.closest("p");
+    expect(bold.tagName).toBe("B");
+    expect(text.innerHTML).toBe("Отличная статья <b>спасибо</b>! ");
+    expect(text.querySelector("img, script, [onerror]")).toBeNull();
+    expect(window.alert).not.toHaveBeenCalled();
+  });
+
   it("отправляет комментарий и показывает его в списке", async () => {
     postComment.mockResolvedValue({
       _id: "2",
@@ -41,6 +62,22 @@ describe("CommentInput", () => {
     const list = await screen.findByRole("list", { name: "Комментарии" });
     expect(list).toHaveTextContent("Спасибо за статью");
     expect(postComment).toHaveBeenCalledWith("olive-ink", "Спасибо за статью");
+  });
+
+  it("показывает причину, по которой сервер отклонил комментарий", async () => {
+    postComment.mockRejectedValue(
+      Object.assign(new Error("400"), { reason: "Поле text не содержит текста после очистки HTML" }),
+    );
+
+    render(<CommentInput article="olive-ink" />);
+    fireEvent.change(screen.getByLabelText("Текст комментария"), {
+      target: { value: "<img src=x onerror=alert(1)>" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Комментарий отклонён: Поле text не содержит текста после очистки HTML",
+    );
   });
 
   it("не отправляет пустой комментарий и показывает ошибку", async () => {
@@ -64,7 +101,7 @@ describe("CommentInput", () => {
     const alert = await screen.findByRole("alert");
     expect(alert).toHaveTextContent("Ошибка · добавьте пару слов");
     expect(input).toHaveAttribute("aria-invalid", "true");
-    expect(input).toHaveAccessibleDescription("Ошибка · добавьте пару слов");
+    expect(input).toHaveAccessibleDescription(expect.stringContaining("Ошибка · добавьте пару слов"));
     expect(input).toHaveFocus();
   });
 });

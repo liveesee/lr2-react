@@ -21,11 +21,16 @@ export default function Home({ articles, renderedAt }) {
       </Head>
       <div className="page">
         <SiteHeader />
-        <p className="note">Свежие публикации на {renderedAt} (страница собрана на сервере)</p>
-        <main className="list">
-          {articles.map((article) => (
-            <ArticleCard key={article.id} {...article} />
-          ))}
+        <main id="content" tabIndex={-1}>
+          <h1 className="visually-hidden">Статьи блога FOLIA</h1>
+          <p className="note">Свежие публикации на {renderedAt} (страница собрана на сервере)</p>
+          <ul className="list">
+            {articles.map((article) => (
+              <li key={article.id}>
+                <ArticleCard {...article} />
+              </li>
+            ))}
+          </ul>
         </main>
       </div>
     </>

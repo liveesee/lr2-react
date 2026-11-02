@@ -10,10 +10,11 @@ export default function LikeButton({ initialCount = 0 }) {
     <button
       type="button"
       className={styles.button}
-      aria-label="Нравится"
+      title="Нравится"
       onClick={() => setCount((value) => value + 1)}
     >
       <Heart />
+      <span className="visually-hidden">Нравится: </span>
       <span className={styles.count}>{count}</span>
     </button>
   )

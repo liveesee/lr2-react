@@ -7,12 +7,14 @@ import CommentInput from "../CommentInput/CommentInput.jsx"
 import { Avatar, CommentIcon, ShareIcon } from "../icons.jsx"
 import styles from "./ArticleCard.module.css"
 
-export default function ArticleCard({ slug, title, author, previewText, imageUrl, minutes }) {
+export default function ArticleCard({ slug, title, author, previewText, imageUrl, imageAlt, minutes }) {
   const [commentsOpen, setCommentsOpen] = useState(false)
+  const titleId = `${slug}-title`
+  const threadId = `${slug}-comments`
 
   return (
-    <article className={styles.card}>
-      <Image className={styles.cover} src={imageUrl} alt="" width={800} height={400} />
+    <article className={styles.card} aria-labelledby={titleId}>
+      <Image className={styles.cover} src={imageUrl} alt={imageAlt} width={800} height={400} />
       <div className={styles.body}>
         <div className={styles.meta}>
           <Avatar />
@@ -21,7 +23,7 @@ export default function ArticleCard({ slug, title, author, previewText, imageUrl
             <p className={styles.minutes}>{minutes} мин</p>
           </div>
         </div>
-        <h2 className={styles.title}>
+        <h2 className={styles.title} id={titleId}>
           <Link href={`/posts/${slug}`} className={styles.link}>
             {title}
           </Link>
@@ -34,21 +36,20 @@ export default function ArticleCard({ slug, title, author, previewText, imageUrl
               type="button"
               className={styles.comment}
               aria-expanded={commentsOpen}
+              aria-controls={threadId}
               onClick={() => setCommentsOpen((open) => !open)}
             >
               <CommentIcon />
               <span>Комментарий</span>
             </button>
-            <button type="button" className={styles.share} aria-label="Поделиться">
+            <button type="button" className={styles.share} aria-label="Поделиться" title="Поделиться">
               <ShareIcon />
             </button>
           </div>
         </div>
-        {commentsOpen ? (
-          <div className={styles.thread}>
-            <CommentInput article={slug} />
-          </div>
-        ) : null}
+        <div id={threadId} className={styles.thread} hidden={!commentsOpen}>
+          {commentsOpen ? <CommentInput article={slug} /> : null}
+        </div>
       </div>
     </article>
   )
@@ -60,5 +61,6 @@ ArticleCard.propTypes = {
   author: PropTypes.string.isRequired,
   previewText: PropTypes.string.isRequired,
   imageUrl: PropTypes.string.isRequired,
+  imageAlt: PropTypes.string.isRequired,
   minutes: PropTypes.number.isRequired,
 }

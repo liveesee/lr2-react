@@ -35,29 +35,45 @@ export default function Post({ article, generatedAt }) {
       </Head>
       <div className={styles.page}>
         <SiteHeader />
-        <Link href="/" className={styles.back}>
-          ← Все статьи
-        </Link>
-        <article>
-          <Image className={styles.cover} src={article.imageUrl} alt="" width={1200} height={600} priority />
-          <div className={styles.meta}>
-            <Avatar />
-            <div>
-              <p className={styles.author}>{article.author}</p>
-              <p className={styles.minutes}>{article.minutes} мин</p>
+        <main id="content" tabIndex={-1}>
+          <Link href="/" className={styles.back}>
+            <span aria-hidden="true">← </span>Все статьи
+          </Link>
+          <article aria-labelledby="post-title">
+            <Image
+              className={styles.cover}
+              src={article.imageUrl}
+              alt={article.imageAlt}
+              width={1200}
+              height={600}
+              priority
+            />
+            <div className={styles.meta}>
+              <Avatar />
+              <div>
+                <p className={styles.author}>{article.author}</p>
+                <p className={styles.minutes}>{article.minutes} мин</p>
+              </div>
             </div>
-          </div>
-          <h1 className={styles.title}>{article.title}</h1>
-          {article.content.map((paragraph) => (
-            <p key={paragraph} className={styles.paragraph}>
-              {paragraph}
-            </p>
-          ))}
-          <p className={styles.generated}>Страница сгенерирована при сборке: {generatedAt}</p>
-          <LikeButton />
-          <hr className={styles.divider} />
-          <CommentInput article={article.slug} />
-        </article>
+            <h1 className={styles.title} id="post-title">
+              {article.title}
+            </h1>
+            {article.content.map((paragraph) => (
+              <p key={paragraph} className={styles.paragraph}>
+                {paragraph}
+              </p>
+            ))}
+            <p className={styles.generated}>Страница сгенерирована при сборке: {generatedAt}</p>
+            <LikeButton />
+            <hr className={styles.divider} />
+            <section aria-labelledby="comments-title">
+              <h2 id="comments-title" className="visually-hidden">
+                Комментарии
+              </h2>
+              <CommentInput article={article.slug} />
+            </section>
+          </article>
+        </main>
       </div>
     </>
   );
@@ -70,6 +86,7 @@ Post.propTypes = {
     author: PropTypes.string.isRequired,
     content: PropTypes.arrayOf(PropTypes.string).isRequired,
     imageUrl: PropTypes.string.isRequired,
+    imageAlt: PropTypes.string.isRequired,
     minutes: PropTypes.number.isRequired,
   }).isRequired,
   generatedAt: PropTypes.string.isRequired,

@@ -51,4 +51,20 @@ describe("CommentInput", () => {
     expect(await screen.findByText("Ошибка · добавьте пару слов")).toBeInTheDocument();
     expect(postComment).not.toHaveBeenCalled();
   });
+
+  it("связывает поле с меткой и ошибкой, возвращает фокус в поле", async () => {
+    render(<CommentInput article="olive-ink" />);
+    const input = screen.getByLabelText("Текст комментария");
+
+    expect(input.tagName).toBe("INPUT");
+    expect(input).not.toHaveAttribute("aria-invalid", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Отправить" }));
+
+    const alert = await screen.findByRole("alert");
+    expect(alert).toHaveTextContent("Ошибка · добавьте пару слов");
+    expect(input).toHaveAttribute("aria-invalid", "true");
+    expect(input).toHaveAccessibleDescription("Ошибка · добавьте пару слов");
+    expect(input).toHaveFocus();
+  });
 });
